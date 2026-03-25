@@ -29,6 +29,14 @@ python app.py
 Open your web browser and navigate to:
 http://127.0.0.1:5000
 
+## 🛠️ Tech Stack & Design Decisions
+# Backend: Python & Flask (Primary Focus)
+As a Backend-focused engineer, my priority was creating a robust data pipeline and efficient logic:
+Why Flask? I chose Flask for its "micro" philosophy. For a registry of 100 items, a heavy framework like Django would be overkill. Flask allows for a clean, performant, and readable codebase.
+Data Processing: I implemented a custom filtering and sorting engine using Python's list comprehensions and lambda functions. This ensures $O(n)$ search efficiency, providing immediate results without the overhead of a database for this specific dataset size.Error Handling: The data_loader.py module includes try-except blocks to handle missing files or corrupted JSON, ensuring the backend never crashes unexpectedly.
+# Frontend: Jinja2 & Bootstrap 5Server-Side Rendering (SSR): 
+By using Jinja2, the data is processed on the server before being sent to the client. This keeps the business logic on the backend where it belongs.Responsive UI: I used Bootstrap 5 to ensure the "Discovery" experience is functional across all device sizes with zero custom CSS maintenance.
+
 ## ⚙️ Key Features
 Dynamic Search: Filter the list of 100 restaurants by typing a Name or Cuisine. The search is case-insensitive.
 
