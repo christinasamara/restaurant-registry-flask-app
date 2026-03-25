@@ -29,7 +29,7 @@ python app.py
 Open your web browser and navigate to:
 http://127.0.0.1:5000
 
-⚙️ Key Features
+## ⚙️ Key Features
 Dynamic Search: Filter the list of 100 restaurants by typing a Name or Cuisine. The search is case-insensitive.
 
 Smart Sorting:
@@ -42,7 +42,7 @@ Data Integrity: Uses a modular data_loader.py script to safely parse the restaur
 
 Responsive UI: Built with a Bootstrap 5 grid system, making the app functional on both mobile and desktop devices.
 
-📂 Project Structure
+## 📂 Project Structure
 app.py: The main entry point. Handles routing, filtering, and sorting logic.
 
 data_loader.py: Backend script for loading the JSON data.
