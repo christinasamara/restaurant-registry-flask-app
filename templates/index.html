@@ -11,14 +11,12 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8f9fa;
-            /* A very light grey to make white cards pop */
             color: #2d3436;
         }
 
         .card {
             border: none;
             transition: transform 0.2s;
-            /* Subtle lift effect */
         }
 
         .card:hover {
@@ -27,7 +25,6 @@
 
         .brand-color {
             color: #e67e22;
-            /* A warm "foodie" orange */
         }
     </style>
 </head>
@@ -41,29 +38,76 @@
 
         <main>
             <div class="row mb-5">
-                <div class="col-md-6 offset-md-3">
-                    <form action="/" method="GET" class="d-flex">
-                        <input type="text" name="search" class="form-control me-2"
-                            placeholder="Search by name or cuisine..." aria-label="Search"
-                            value="{{ request.args.get('search', '') }}">
-                        <button class="btn btn-outline-success" type="submit">Search</button>
-                        <a href="/" class="btn btn-link text-secondary">Clear</a>
-                    </form>
-                    <div class="d-flex justify-content-center gap-2 mt-3">
-                        <span>Sort by:</span>
-                        <a href="{{ url_for('index', search=request.args.get('search', ''), sort='rating') }}"
-                            class="btn btn-sm {% if request.args.get('sort') == 'rating' %}btn-success{% else %}btn-outline-success{% endif %}">
-                            Highest Rating
-                        </a>
-                        <a href="{{ url_for('index', search=request.args.get('search', ''), sort='time') }}"
-                            class="btn btn-sm {% if request.args.get('sort') == 'time' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
-                            Fastest Delivery
-                        </a>
-                        <a href="{{ url_for('index', search=request.args.get('search', '')) }}"
-                            class="btn btn-sm btn-outline-danger">
-                            Reset Sort
-                        </a>
+                <div class="container mb-5">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+
+                            <form action="{{ url_for('index') }}" method="get" class="d-flex gap-2 mb-3">
+                                <input type="text" name="search" class="form-control form-control-lg shadow-sm"
+                                    placeholder="Search by name or cuisine..."
+                                    value="{{ request.args.get('search', '') }}">
+                                <button type="submit" class="btn btn-success px-4 shadow-sm">Search</button>
+                                <a href="{{ url_for('index') }}"
+                                    class="btn btn-outline-secondary d-flex align-items-center">Clear</a>
+                            </form>
+
+                            <div
+                                class="d-flex align-items-center justify-content-between flex-wrap gap-2 bg-white p-3 rounded shadow-sm">
+
+                                <div class="dropdown">
+                                    <button class="btn btn-light border dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown">
+                                        <i class="bi bi-sort-down"></i> Sort By...
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item"
+                                                href="{{ url_for('index', sort='rating_desc', search=request.args.get('search', ''), min_rating=request.args.get('min_rating', '')) }}">Highest
+                                                Rated</a></li>
+                                        <li><a class="dropdown-item"
+                                                href="{{ url_for('index', sort='rating_asc', search=request.args.get('search', ''), min_rating=request.args.get('min_rating', '')) }}">Lowest
+                                                Rated</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item"
+                                                href="{{ url_for('index', sort='time_asc', search=request.args.get('search', ''), min_rating=request.args.get('min_rating', '')) }}">Fastest
+                                                Delivery</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item"
+                                                href="{{ url_for('index', sort='name_asc', search=request.args.get('search', ''), min_rating=request.args.get('min_rating', '')) }}">A
+                                                to Z</a></li>
+                                    </ul>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="text-muted small fw-bold text-uppercase">Quick Filter:</span>
+                                    <a href="{{ url_for('index', min_rating=4.5, search=request.args.get('search', ''), sort=request.args.get('sort', '')) }}"
+                                        class="btn btn-sm {% if request.args.get('min_rating') == '4.5' %}btn-warning{% else %}btn-outline-warning{% endif %} rounded-pill px-3">
+                                        ⭐ 4.5+ Stars
+                                    </a>
+
+                                    {% if request.args.get('min_rating') or request.args.get('sort') or
+                                    request.args.get('search') %}
+                                    <a href="{{ url_for('index') }}"
+                                        class="text-danger small text-decoration-none ms-2">Reset All</a>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col text-center text-muted">
+                    {% if total_count > 0 %}
+                    <span class="badge bg-light text-dark border p-2">
+                        🔍 Found <strong>{{ total_count }}</strong> restaurants
+                        | 🕒 Avg. Delivery: <strong>{{ avg_time }} mins</strong>
+                    </span>
+                    {% endif %}
                 </div>
             </div>
             {% if restaurants %}
@@ -71,18 +115,22 @@
                 {% for restaurant in restaurants %}
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title fw-bold mb-0">{{ restaurant.name }}</h5>
-                                <span class="badge rounded-pill bg-warning text-dark">{{ restaurant.rating }} ★</span>
+                        <a href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}"
+                            class=" link-dark text-decoration-none">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title fw-bold mb-0">{{ restaurant.name }}</h5>
+                                    <span class="badge rounded-pill bg-warning text-dark">{{ restaurant.rating }}
+                                        ★</span>
+                                </div>
+                                <h6 class="card-subtitle mb-3 text-primary">{{ restaurant.cuisine }}</h6>
+                                <div class="pt-3 border-top mt-auto">
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock"></i> {{ restaurant.delivery_time_mins }} mins delivery
+                                    </small>
+                                </div>
                             </div>
-                            <h6 class="card-subtitle mb-3 text-primary">{{ restaurant.cuisine }}</h6>
-                            <div class="pt-3 border-top mt-auto">
-                                <small class="text-muted">
-                                    <i class="bi bi-clock"></i> {{ restaurant.delivery_time_mins }} mins delivery
-                                </small>
-                            </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
                 {% endfor %}
@@ -100,6 +148,7 @@
             <p>&copy; 2026 Engineering Assessment Prep</p>
         </footer>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
